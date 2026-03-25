@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta property="og:title" content="English Perf Assessment">
+<meta property="og:description" content="영어 단어 수행평가 연습">
+<meta property="og:type" content="website">
+
 <title>English Perf Assessment</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -433,7 +437,6 @@
 </head>
 <body>
 
-<!-- MENU -->
 <div id="screen-menu" class="screen active">
   <div class="menu-card">
     <div class="menu-header">
@@ -468,7 +471,6 @@
   </div>
 </div>
 
-<!-- PLAYING -->
 <div id="screen-playing" class="screen">
   <div class="progress-area">
     <div class="progress-labels">
@@ -479,19 +481,14 @@
   </div>
 
   <div class="quiz-card">
-    <!-- Question -->
     <div class="question-area" id="question-area">
-      <!-- filled by JS -->
-    </div>
+      </div>
 
-    <!-- Interaction -->
     <div class="input-area" id="input-area">
-      <!-- filled by JS -->
-    </div>
+      </div>
   </div>
 </div>
 
-<!-- RESULT -->
 <div id="screen-result" class="screen">
   <div class="result-card">
     <div class="score-circle">
@@ -792,7 +789,7 @@ function checkAnswer(answer) {
       <div class="feedback-left">
         <div class="feedback-icon">${icon}</div>
         <div>
-          <div class="feedback-title">${isCorrect ? 'Correct' : 'Incorrect}</div>
+          <div class="feedback-title">${isCorrect ? 'Correct' : 'Incorrect'}</div>
           ${wrongMsg}
         </div>
       </div>
@@ -845,3 +842,4 @@ function goMenu() {
 </script>
 </body>
 </html>
+
