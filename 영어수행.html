@@ -1,0 +1,389 @@
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { CheckCircle2, XCircle, ChevronRight, RefreshCw, BookOpen, PenTool } from 'lucide-react';
+
+const vocabList = [
+  { id: 1, root: "confirm", answer: "confirmed", meaning: "입증[확증] 하다", syn: "verify, prove, substantiate", sentence: "The study [ ] the effectiveness of the new treatment.", hint: "c________" },
+  { id: 2, root: "reject", answer: "rejected", meaning: "거부하다, 거절하다", syn: "refuse, decline, deny", sentence: "He [ ] the offer because it did not meet his expectations.", hint: "r_______" },
+  { id: 3, root: "inspire", answer: "inspired", meaning: "영감을 주다", syn: "motivate, stimulate, encourage", sentence: "Her courage [ ] many students to pursue their dreams.", hint: "i_______" },
+  { id: 4, root: "alter", answer: "alter", meaning: "변경하다", syn: "change, modify, adjust", sentence: "Climate change may [ ] living conditions significantly.", hint: "a____" },
+  { id: 5, root: "justification", answer: "justification", meaning: "구실, 변명, 정당화", syn: "explanation, excuse, rationale", sentence: "There is no [ ] for such unfair behavior.", hint: "j____________" },
+  { id: 6, root: "accumulate", answer: "accumulate", meaning: "축적하다", syn: "collect, gather, build up", sentence: "Stress can [ ] over time if not managed properly.", hint: "a_________" },
+  { id: 7, root: "empathy", answer: "Empathy", meaning: "공감", syn: "sympathy, understanding, compassion", sentence: "[ ] helps people build stronger relationships.", hint: "E______" },
+  { id: 8, root: "inherent", answer: "inherent", meaning: "내재하는", syn: "innate, intrinsic, built-in", sentence: "Risk is [ ] in every important decision.", hint: "i_______" },
+  { id: 9, root: "challenge", answer: "challenged", meaning: "의심하다", syn: "question, dispute, doubt", sentence: "Scientists [ ] the accuracy of the data.", hint: "c_________" },
+  { id: 10, root: "relevant", answer: "relevant", meaning: "관련 있는", syn: "related, connected, applicable", sentence: "Please provide information [ ] to the topic.", hint: "r_______" },
+  { id: 11, root: "abandon", answer: "abandoned", meaning: "포기하다", syn: "give up, quit, desert", sentence: "They [ ] the plan due to lack of funding.", hint: "a________" },
+  { id: 12, root: "accountable", answer: "accountable", meaning: "책임 있는", syn: "responsible, liable, answerable, to blame", sentence: "Leaders must be [ ] for their decisions.", hint: "a__________" },
+  { id: 13, root: "restrict", answer: "restrict", meaning: "제한하다", syn: "limit, confine, control", sentence: "Laws [ ] the use of harmful chemicals.", hint: "r_______" },
+  { id: 14, root: "commitment", answer: "commitment", meaning: "전념, 헌신", syn: "dedication, devotion, loyalty", sentence: "His [ ] to education is admirable.", hint: "c_________" },
+  { id: 15, root: "valid", answer: "valid", meaning: "타당한, 근거 있는", syn: "reasonable, sound, justified", sentence: "Your argument is [ ] and well supported.", hint: "v____" },
+  { id: 16, root: "interpret", answer: "interpreted", meaning: "해석하다", syn: "explain, analyze, understand", sentence: "Students [ ] the poem in different ways.", hint: "i__________" },
+  { id: 17, root: "essential", answer: "essential", meaning: "필수적인", syn: "necessary, vital, crucial", sentence: "Sleep is [ ] for good health.", hint: "e________" },
+  { id: 18, root: "emphasize", answer: "emphasized", meaning: "강조하다", syn: "stress, highlight, underline", sentence: "The teacher [ ] the importance of practice.", hint: "e_________" },
+  { id: 19, root: "capacity", answer: "capacity", meaning: "역량", syn: "ability, competence, potential", sentence: "Humans have a remarkable [ ] for learning.", hint: "c_______" },
+  { id: 20, root: "dismiss", answer: "dismissed", meaning: "일축하다", syn: "reject, ignore, brush off", sentence: "He [ ] the idea as unrealistic.", hint: "d________" },
+  { id: 21, root: "component", answer: "component", meaning: "구성 요소", syn: "element, part, factor", sentence: "Trust is a key [ ] of teamwork.", hint: "c________" },
+  { id: 22, root: "overlook", answer: "overlook", meaning: "간과하다", syn: "miss, ignore, neglect", sentence: "We must not [ ] small details in terms of safety.", hint: "o_______" },
+  { id: 23, root: "confront", answer: "confronted", meaning: "마주하다, 직면하다", syn: "face, encounter, tackle", sentence: "She [ ] her fears bravely.", hint: "c_________" },
+  { id: 24, root: "distortion", answer: "distortion", meaning: "왜곡", syn: "misrepresentation, contortion, bias", sentence: "Media [ ] can mislead the public.", hint: "d_________" },
+  { id: 25, root: "ultimately", answer: "ultimately", meaning: "궁극적으로", syn: "finally, eventually, in the end", sentence: "Hard work will [ ] lead to success.", hint: "u_________" },
+  { id: 26, root: "perceive", answer: "perceive", meaning: "여기다, 인식하다", syn: "recognize, realize, sense", sentence: "People [ ] risks differently.", hint: "p_______" },
+  { id: 27, root: "evaluate", answer: "evaluated", meaning: "평가하다", syn: "assess, judge, analyze", sentence: "The teacher [ ] the students' performance carefully.", hint: "e________" },
+  { id: 28, root: "authority", answer: "authority", meaning: "권한", syn: "power, control, command", sentence: "The government has the [ ] to enforce the law.", hint: "a________" },
+  { id: 29, root: "objective", answer: "objective", meaning: "목표", syn: "goal, aim, purpose", sentence: "Our main [ ] is to reduce pollution.", hint: "o________" },
+  { id: 30, root: "subsequently", answer: "subsequently", meaning: "그 후에", syn: "afterward, later, eventually", sentence: "The system failed and was [ ] repaired.", hint: "s___________" },
+  { id: 31, root: "effectiveness", answer: "effectiveness", meaning: "효과, 효율성", syn: "efficiency, impact, success", sentence: "The [ ] of the policy remains uncertain.", hint: "e____________" },
+  { id: 32, root: "ingredient", answer: "ingredient", meaning: "요인, 구성 요소", syn: "element, component, factor", sentence: "Trust is an important [ ] in friendship.", hint: "i_________" },
+  { id: 33, root: "abstract", answer: "abstract", meaning: "추상적인", syn: "conceptual, intangible, nonconcrete", sentence: "Freedom is an [ ] concept that is difficult to define clearly.", hint: "a_______" },
+  { id: 34, root: "entail", answer: "entails", meaning: "수반하다", syn: "involve, require, include, lead to", sentence: "This job [ ] long hours and constant concentration.", hint: "e______" },
+  { id: 35, root: "consensus", answer: "consensus", meaning: "합의, 일치", syn: "agreement, unity, accord", sentence: "Scientists reached a [ ] on the results.", hint: "c________" },
+  { id: 36, root: "consist of", answer: "consists of", meaning: "~로 구성되다", syn: "be made up of, be composed of", sentence: "The team [ ] five members.", hint: "c_______ o_" },
+  { id: 37, root: "endure", answer: "endured", meaning: "견디다, 인내하다", syn: "tolerate, withstand, bear", sentence: "She [ ] years of hardship to graduate college successfully.", hint: "e______" },
+  { id: 38, root: "overlap", answer: "overlap", meaning: "겹치다", syn: "coincide, intersect, merge", sentence: "The two ideas [ ] in meaning.", hint: "o______" },
+  { id: 39, root: "undervalue", answer: "undervalues", meaning: "저평가하다", syn: "underestimate, underappreciate", sentence: "Society often [ ] manual labor.", hint: "u__________" },
+  { id: 40, root: "indicate", answer: "indicate", meaning: "보여주다, 나타내다", syn: "show, suggest, point out", sentence: "The results [ ] a clear trend.", hint: "i_______" },
+  { id: 41, root: "outcome", answer: "outcome", meaning: "결과", syn: "result, consequence, effect", sentence: "The final [ ] exceeded our original expectations.", hint: "o______" },
+  { id: 42, root: "rational", answer: "rational", meaning: "합리적인", syn: "logical, reasonable, sensible", sentence: "He gave a [ ] explanation that everyone accepted.", hint: "r_______" },
+  { id: 43, root: "grasp", answer: "grasp", meaning: "이해하다", syn: "understand, comprehend, realize", sentence: "Students must [ ] the key idea to solve complex problems.", hint: "g____" },
+  { id: 44, root: "trigger", answer: "trigger", meaning: "유발하다", syn: "cause, activate, provoke", sentence: "Stress can [ ] physical illness.", hint: "t______" },
+  { id: 45, root: "critical", answer: "critical", meaning: "중요한", syn: "crucial, essential, vital", sentence: "Trust is [ ] to a healthy relationship.", hint: "c_______" },
+  { id: 46, root: "investigate", answer: "investigate", meaning: "연구하다, 조사하다", syn: "examine, explore, research", sentence: "Scientists [ ] the causes of climate change.", hint: "i__________" },
+  { id: 47, root: "refer to", answer: "refers to", meaning: "의미하다", syn: "mean, indicate, denote", sentence: "The word 'self-esteem' [ ] having respect for yourself.", hint: "r_____ t_" },
+  { id: 48, root: "determine", answer: "determines", meaning: "결정하다", syn: "decide, settle, fix", sentence: "Experience [ ] success in many fields.", hint: "d_________" },
+  { id: 49, root: "consequently", answer: "consequently", meaning: "결과적으로", syn: "therefore, as a result, thus", sentence: "He worked hard and [ ] succeeded.", hint: "c___________" },
+  { id: 50, root: "precede", answer: "precedes", meaning: "선행하다", syn: "come before, lead, anticipate", sentence: "Theory [ ] practical application.", hint: "p_______" },
+  { id: 51, root: "simultaneously", answer: "simultaneously", meaning: "동시에", syn: "at the same time, concurrently, together, in parallel", sentence: "The two events occurred [ ].", hint: "s_____________" },
+  { id: 52, root: "purification", answer: "purification", meaning: "정화", syn: "cleansing, refinement, filtration", sentence: "Water [ ] is essential for public health.", hint: "p___________" },
+  { id: 53, root: "subjective", answer: "subjective", meaning: "주관적인", syn: "personal, individual, biased, opinion-based", sentence: "Artistic beauty is highly [ ].", hint: "s_________" },
+  { id: 54, root: "reflective", answer: "reflective", meaning: "반영하는", syn: "thoughtful, contemplative, revealing, indicative", sentence: "His essay was [ ] of deep personal growth.", hint: "r_________" },
+  { id: 55, root: "take place", answer: "take place", meaning: "일어나다, 열리다", syn: "occur, happen, be held, come about", sentence: "The conference will [ ] next Monday.", hint: "t___ p____" },
+  { id: 56, root: "restoration", answer: "restoration", meaning: "회복", syn: "recovery, renewal, rehabilitation, repair", sentence: "Forest [ ] is crucial for environmental balance.", hint: "r__________" },
+  { id: 57, root: "immediate", answer: "immediate", meaning: "즉각적인", syn: "instant, prompt, rapid", sentence: "The patient needs [ ] care.", hint: "i________" },
+  { id: 58, root: "diverse", answer: "diverse", meaning: "다양한", syn: "various, varied, multiple", sentence: "The city has a [ ] population.", hint: "d______" },
+  { id: 59, root: "bygone", answer: "bygone", meaning: "지나간, 과거의", syn: "past, former, previous, earlier", sentence: "We should learn from [ ] mistakes.", hint: "b_____" },
+  { id: 60, root: "for the sake of", answer: "for the sake of", meaning: "~을 위해", syn: "for, in order to, on behalf of", sentence: "He apologized [ ] peace.", hint: "f__ t__ s___ o_" },
+  { id: 61, root: "inactivity", answer: "inactivity", meaning: "비활동", syn: "idleness, stillness, passivity", sentence: "Prolonged [ ] weakens muscles.", hint: "i_________" },
+  { id: 62, root: "imitate", answer: "imitate", meaning: "모방하다", syn: "copy, mimic, replicate", sentence: "Children often [ ] adults' behavior.", hint: "i______" },
+  { id: 63, root: "normative", answer: "Normative", meaning: "규범의", syn: "customary, conventional, standardrule-based", sentence: "[ ] rules guide social behavior.", hint: "N________" },
+  { id: 64, root: "contribution", answer: "contribution", meaning: "기여", syn: "donation, input, support, service", sentence: "His [ ] to science is remarkable.", hint: "c___________" },
+  { id: 65, root: "modest", answer: "modest", meaning: "대단하지 않은", syn: "moderate, small, humble, limited", sentence: "She made [ ] progress in math.", hint: "m_____" },
+  { id: 66, root: "yield", answer: "yielded", meaning: "생기게 하다, 생산하다", syn: "produce, generate, result in, create", sentence: "The experiment [ ] unexpected results.", hint: "y______" },
+  { id: 67, root: "precision", answer: "precision", meaning: "정밀도", syn: "accuracy, exactness, correctness, detail", sentence: "Surgery requires extreme [ ].", hint: "p________" },
+  { id: 68, root: "vulnerability", answer: "vulnerability", meaning: "취약성", syn: "weakness, fragility, susceptibility, exposure", sentence: "Children show emotional [ ] easily.", hint: "v____________" },
+  { id: 69, root: "confidential", answer: "confidential", meaning: "비밀의", syn: "secret, private, classified, restricted", sentence: "This document is strictly [ ].", hint: "c___________" },
+  { id: 70, root: "adherence", answer: "adherence", meaning: "엄수, 충실", syn: "compliance, observance, loyalty, commitment", sentence: "Strict [ ] ensures better results.", hint: "a________" },
+  { id: 71, root: "maturity", answer: "maturity", meaning: "성숙(도)", syn: "adulthood, ripeness, development", sentence: "His [ ] impressed the teachers.", hint: "m_______" },
+  { id: 72, root: "alternative", answer: "alternative", meaning: "대체물", syn: "substitute, option, replacement, choice", sentence: "We need a practical [ ] to this plan.", hint: "a__________" },
+  { id: 73, root: "benefit", answer: "benefits", meaning: "이점", syn: "advantage, merit, gain, profit", sentence: "Regular exercise offers many health [ ].", hint: "b_______" },
+  { id: 74, root: "neutral", answer: "neutral", meaning: "중립의", syn: "impartial, unbiased, objective, nonpartisan", sentence: "The judge remained [ ] during the debate.", hint: "n______" },
+  { id: 75, root: "evoke", answer: "evoked", meaning: "불러일으키다", syn: "arouse, elicit, trigger, stir", sentence: "The song [ ] memories of childhood summers.", hint: "e_____" },
+  { id: 76, root: "encounter", answer: "encountered", meaning: "접하다, 마주치다", syn: "meet, face, confront, come across", sentence: "She [ ] many unexpected difficulties abroad.", hint: "e__________" },
+  { id: 77, root: "generate", answer: "generated", meaning: "생성하다", syn: "produce, create, cause, yield", sentence: "The new policy [ ] positive results quickly.", hint: "g________" },
+  { id: 78, root: "overcome", answer: "overcame", meaning: "극복하다", syn: "conquer, defeat", sentence: "She [ ] many challenges through hard work.", hint: "o_______" },
+  { id: 79, root: "controversial", answer: "controversial", meaning: "논쟁의 대상인", syn: "disputed, debatable, provocative", sentence: "The decision became highly [ ] nationwide.", hint: "c____________" },
+  { id: 80, root: "convince", answer: "convinced", meaning: "납득시키다, 확신시키다", syn: "persuade, assure, satisfy", sentence: "She [ ] him with clear evidence.", hint: "c________" },
+  { id: 81, root: "subtle", answer: "subtle", meaning: "미묘한", syn: "delicate, slight, faint", sentence: "She noticed a [ ] change in tone.", hint: "s_____" },
+  { id: 82, root: "inference", answer: "inference", meaning: "추론", syn: "deduction, conclusion, reasoning, interpretation", sentence: "We made an [ ] from limited evidence.", hint: "i________" },
+  { id: 83, root: "compelling", answer: "compelling", meaning: "설득력 있는", syn: "convincing, persuasive, forceful, powerful", sentence: "She presented a [ ] argument clearly.", hint: "c_________" },
+  { id: 84, root: "portrait", answer: "portrait", meaning: "초상화", syn: "painting, likeness, depiction, image", sentence: "The artist painted a detailed [ ].", hint: "p_______" },
+  { id: 85, root: "exemplary", answer: "exemplary", meaning: "모범적인", syn: "outstanding, model, admirable, ideal", sentence: "She showed [ ] leadership at school.", hint: "e________" },
+  { id: 86, root: "narrative", answer: "narrative", meaning: "서사적인", syn: "storytelling, descriptive, dramatic", sentence: "The film has a strong [ ] structure.", hint: "n________" },
+  { id: 87, root: "succession", answer: "succession", meaning: "연속", syn: "sequence, series, progression, chain", sentence: "A [ ] of events changed history.", hint: "s_________" },
+  { id: 88, root: "empathize", answer: "empathized", meaning: "공감하다", syn: "understand, relate to, sympathize, identify with", sentence: "She [ ] with his difficult situation.", hint: "e_________" },
+  { id: 89, root: "striking", answer: "striking", meaning: "놀라운", syn: "remarkable, impressive, astonishing, dramatic", sentence: "She made a [ ] improvement this year.", hint: "s_______" },
+  { id: 90, root: "spouse", answer: "spouse", meaning: "배우자", syn: "partner, husband, wife, mate", sentence: "She proudly introduced her [ ] at the ceremony.", hint: "s_____" },
+  { id: 91, root: "strengthen", answer: "strengthens", meaning: "강화하다", syn: "reinforce, enhance, fortify, boost", sentence: "Regular practice [ ] your language skills significantly.", hint: "s__________" },
+  { id: 92, root: "conservative", answer: "conservative", meaning: "보수적인", syn: "traditional, cautious, conventional", sentence: "He has a [ ] view on social change.", hint: "c___________" },
+  { id: 93, root: "interpret", answer: "interpreted", meaning: "해석하다", syn: "explain, understand, translate", sentence: "Students [ ] the poem in different ways.", hint: "i__________" },
+  { id: 94, root: "territory", answer: "territory", meaning: "영역", syn: "area, region, domain, field", sentence: "This topic belongs to a new [ ].", hint: "t________" },
+  { id: 95, root: "stable", answer: "stable", meaning: "안정적인", syn: "steady, secure, firm, consistent", sentence: "The company maintains a [ ] financial structure.", hint: "s_____" },
+  { id: 96, root: "fake", answer: "faked", meaning: "조작하다", syn: "fabricate, forge, falsify, manipulate", sentence: "He [ ] the results to avoid trouble.", hint: "f____" },
+  { id: 97, root: "adapt", answer: "adapted", meaning: "적응하다", syn: "adjust, accommodate, modify", sentence: "She quickly [ ] to her new school.", hint: "a______" },
+  { id: 98, root: "relevant", answer: "relevant", meaning: "관련 있는", syn: "related, pertinent, connected", sentence: "Please provide [ ] information for the report.", hint: "r_______" },
+  { id: 99, root: "stimulation", answer: "stimulation", meaning: "자극", syn: "encouragement, activation, excitement, inspiration", sentence: "The game provides mental [ ] for students.", hint: "s__________" },
+  { id: 100, root: "neuron", answer: "neuron", meaning: "뉴런, 신경 세포", syn: "nerve cell, brain cell, neural cell", sentence: "Each [ ] sends signals to other cells.", hint: "n_____" }
+];
+
+
+// 배열을 무작위로 섞는 헬퍼 함수
+const shuffleArray = (array) => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
+export default function App() {
+  const [gameState, setGameState] = useState('menu'); // 'menu', 'playing', 'result'
+  const [gameType, setGameType] = useState(1); // 1: 박스 선택형, 2: 힌트 입력형
+  const [questions, setQuestions] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [feedback, setFeedback] = useState(null); // { isCorrect: boolean, correctAnswer: string }
+  const [userInput, setUserInput] = useState('');
+  const [sessionWordBank, setSessionWordBank] = useState([]); // 유형 1을 위한 단어 보기 박스 상태
+  
+  const inputRef = useRef(null);
+
+  // 게임 시작
+  const startGame = (type) => {
+    // 랜덤으로 10문제 추출 (데이터가 10개 미만이면 전체)
+    const shuffled = shuffleArray(vocabList);
+    const selected = shuffled.slice(0, 10);
+    
+    setQuestions(selected);
+    setSessionWordBank(shuffleArray(selected.map(q => q.answer))); // 추출된 10문제의 정답을 모아 단어 보기 생성
+    setGameType(type);
+    setCurrentIndex(0);
+    setScore(0);
+    setFeedback(null);
+    setUserInput('');
+    setGameState('playing');
+  };
+
+  const currentQ = questions[currentIndex];
+
+  // 입력 필드 포커스
+  useEffect(() => {
+    if (gameState === 'playing' && !feedback && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [gameState, gameType, feedback, currentIndex]);
+
+  // 정답 확인
+  const checkAnswer = (submittedAnswer) => {
+    if (feedback) return; // 이미 피드백이 표시된 상태면 무시
+
+    const isCorrect = submittedAnswer.toLowerCase().trim() === currentQ.answer.toLowerCase().trim();
+    
+    if (isCorrect) {
+      setScore(prev => prev + 1);
+    }
+    
+    setFeedback({
+      isCorrect,
+      correctAnswer: currentQ.answer
+    });
+  };
+
+  // 다음 문제로 이동
+  const nextQuestion = () => {
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex(prev => prev + 1);
+      setFeedback(null);
+      setUserInput('');
+    } else {
+      setGameState('result');
+    }
+  };
+
+  // 문장 렌더링 (빈칸 처리)
+  const renderSentence = (sentence, hintText = '') => {
+    const parts = sentence.split('[ ]');
+    if (parts.length < 2) return <p className="text-xl font-medium">{sentence}</p>;
+
+    return (
+      <p className="text-xl md:text-2xl font-medium leading-relaxed text-gray-800">
+        {parts[0]}
+        <span className={`inline-block mx-2 px-3 py-1 font-bold border-b-2 
+          ${feedback ? (feedback.isCorrect ? 'border-green-500 text-green-600' : 'border-red-500 text-red-600') : 'border-blue-500 text-blue-600 bg-blue-50 rounded-t'}`}>
+          {feedback ? currentQ.answer : (hintText || '          ')}
+        </span>
+        {parts[1]}
+      </p>
+    );
+  };
+
+  // --- 화면 렌더링 로직 ---
+
+  if (gameState === 'menu') {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+          <div className="bg-blue-600 p-6 text-center text-white">
+            <h1 className="text-2xl font-bold mb-2">영어 수행평가 마스터</h1>
+            <p className="text-blue-100">원하는 학습 모드를 선택하세요</p>
+          </div>
+          <div className="p-6 space-y-4">
+            <button 
+              onClick={() => startGame(1)}
+              className="w-full flex items-center p-4 border-2 border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group"
+            >
+              <div className="bg-blue-100 p-3 rounded-lg mr-4 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                <BookOpen size={24} className="text-blue-600 group-hover:text-white" />
+              </div>
+              <div className="text-left">
+                <h2 className="text-lg font-bold text-slate-800">유형 1: 단어 박스 타이핑형</h2>
+                <p className="text-sm text-slate-500">제시된 단어 보기를 보고 빈칸에 알맞은 단어를 타이핑합니다.</p>
+              </div>
+            </button>
+
+            <button 
+              onClick={() => startGame(2)}
+              className="w-full flex items-center p-4 border-2 border-slate-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all group"
+            >
+              <div className="bg-purple-100 p-3 rounded-lg mr-4 group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                <PenTool size={24} className="text-purple-600 group-hover:text-white" />
+              </div>
+              <div className="text-left">
+                <h2 className="text-lg font-bold text-slate-800">유형 2: 힌트 직접 입력형</h2>
+                <p className="text-sm text-slate-500">철자 힌트와 뜻을 보고 단어를 직접 입력합니다.</p>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (gameState === 'result') {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 text-center">
+          <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span className="text-4xl font-black text-blue-600">{score}</span>
+            <span className="text-2xl font-bold text-blue-300">/{questions.length}</span>
+          </div>
+          <h2 className="text-2xl font-bold text-slate-800 mb-2">학습 완료!</h2>
+          <p className="text-slate-600 mb-8">
+            {score === questions.length ? '완벽합니다! 수행평가 만점 예약이네요 🎉' : 
+             score >= questions.length * 0.7 ? '잘했어요! 조금만 더 연습해봐요 👍' : 
+             '꾸준히 연습하면 반드시 좋아질 거예요! 💪'}
+          </p>
+          <button 
+            onClick={() => setGameState('menu')}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center transition-colors"
+          >
+            <RefreshCw size={20} className="mr-2" />
+            메인 메뉴로 돌아가기
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center py-8 px-4">
+      {/* 진행 상태 바 */}
+      <div className="w-full max-w-2xl mb-6">
+        <div className="flex justify-between text-sm font-medium text-slate-500 mb-2">
+          <span>문제 {currentIndex + 1} / {questions.length}</span>
+          <span>점수: {score}</span>
+        </div>
+        <div className="w-full bg-slate-200 rounded-full h-2.5">
+          <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}></div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-lg w-full max-w-2xl overflow-hidden">
+        {/* 문제 영역 */}
+        <div className="p-6 md:p-8 bg-white min-h-[200px] flex flex-col justify-center">
+          {gameType === 1 ? (
+            <>
+              {/* 단어 박스 */}
+              <div className="mb-8 p-5 bg-blue-50 border-2 border-blue-200 rounded-xl">
+                <div className="flex items-center gap-2 mb-3">
+                  <BookOpen size={18} className="text-blue-600" />
+                  <span className="font-bold text-blue-800">단어 보기</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {sessionWordBank.map((word, idx) => {
+                    // 이전 문제들에서 이미 정답으로 나온 단어는 흐리게/취소선 처리 (편의성 제공)
+                    const isUsed = questions.slice(0, currentIndex).some(q => q.answer === word);
+                    return (
+                      <span 
+                        key={idx} 
+                        className={`px-3 py-1.5 bg-white border rounded-lg font-medium shadow-sm transition-all
+                          ${isUsed ? 'border-slate-200 text-slate-400 line-through' : 'border-blue-300 text-slate-800'}`}
+                      >
+                        {word}
+                      </span>
+                    )
+                  })}
+                </div>
+              </div>
+              {renderSentence(currentQ.sentence)}
+            </>
+          ) : (
+            <>
+              {renderSentence(currentQ.sentence, currentQ.hint)}
+              <div className="mt-6 p-4 bg-purple-50 rounded-xl border border-purple-100">
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-start gap-2">
+                    <span className="px-2 py-1 bg-purple-200 text-purple-800 text-xs font-bold rounded">뜻</span>
+                    <span className="font-medium text-slate-800">{currentQ.meaning}</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="px-2 py-1 bg-slate-200 text-slate-700 text-xs font-bold rounded">동의어</span>
+                    <span className="text-slate-600 text-sm">{currentQ.syn}</span>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* 인터랙션 영역 */}
+        <div className="p-6 md:p-8 bg-slate-50 border-t border-slate-100">
+          {!feedback ? (
+            <form 
+              onSubmit={(e) => { e.preventDefault(); if (userInput.trim()) checkAnswer(userInput); }}
+              className="flex gap-3"
+            >
+              <input
+                ref={inputRef}
+                type="text"
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                placeholder={gameType === 1 ? "위 단어 보기에서 찾아 정확히 입력하세요" : `"${currentQ.hint}" 에 맞는 단어를 입력하세요`}
+                className={`flex-1 p-4 border-2 rounded-xl outline-none text-lg font-medium transition-all
+                  ${gameType === 1 ? 'border-blue-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200' : 'border-slate-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200'}`}
+                autoComplete="off"
+                spellCheck="false"
+              />
+              <button
+                type="submit"
+                disabled={!userInput.trim()}
+                className={`${gameType === 1 ? 'bg-blue-600 hover:bg-blue-700' : 'bg-purple-600 hover:bg-purple-700'} disabled:bg-slate-300 text-white font-bold py-4 px-8 rounded-xl transition-colors shadow-sm`}
+              >
+                확인
+              </button>
+            </form>
+          ) : (
+            // 피드백 영역
+            <div className={`p-6 rounded-xl border-2 flex flex-col md:flex-row items-center justify-between gap-4 ${feedback.isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+              <div className="flex items-center gap-4 text-center md:text-left">
+                {feedback.isCorrect ? (
+                  <CheckCircle2 size={48} className="text-green-500 shrink-0 mx-auto md:mx-0" />
+                ) : (
+                  <XCircle size={48} className="text-red-500 shrink-0 mx-auto md:mx-0" />
+                )}
+                <div>
+                  <h3 className={`text-xl font-bold ${feedback.isCorrect ? 'text-green-700' : 'text-red-700'}`}>
+                    {feedback.isCorrect ? '정답입니다!' : '오답입니다!'}
+                  </h3>
+                  {!feedback.isCorrect && (
+                    <p className="text-slate-700 mt-1 font-medium">
+                      정답은 <span className="font-bold text-red-600 px-1">{feedback.correctAnswer}</span> 입니다.
+                    </p>
+                  )}
+                </div>
+              </div>
+              
+              <button
+                onClick={nextQuestion}
+                autoFocus
+                className={`w-full md:w-auto px-6 py-3 font-bold rounded-xl text-white flex items-center justify-center shadow-sm transition-colors
+                  ${feedback.isCorrect ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}`}
+              >
+                다음 문제 <ChevronRight size={20} className="ml-1" />
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
